@@ -5,6 +5,7 @@ import glob
 import re
 import sys
 from IPython.display import display, clear_output
+from canvasapi import Canvas
 
 
 def _token_verif(course_code: int, api_url: str, token_present: bool):

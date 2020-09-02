@@ -1,6 +1,5 @@
 from canvasutils import __version__
-
-# from canvasutils import canvasutils
+from canvasutils import canvasutils
 
 
 def test_version():

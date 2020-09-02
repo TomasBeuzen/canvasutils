@@ -20,13 +20,17 @@ See the file [pyproject.toml](pyproject.toml), `[tool.poetry.dependencies]`.
 
 ## Usage
 
+### Assignment Submission in JUpyter
+
 The submit module is made to be used within a Jupyter notebook (.ipynb file):
+
+![](docs/img/assignment_submit.gif)
 
 ```python
 api_url = "https://canvas.instructure.com/"
 course_code = 123456
 
-from canvasutils import submit
+from canvasutils.submit import submit
 submit(course_code, api_url=api_url, token_present=False)  # token present false allows you to enter token interactively.
 ```
 
