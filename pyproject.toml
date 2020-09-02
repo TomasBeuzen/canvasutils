@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "canvasutils"
-version = "0.1.0"
+version = "0.1.1"
 description = "Utilities for interacting with Canvas using Python and the canvasapi."
 authors = ["Tomas Beuzen <tomas.beuzen@stat.ubc.ca>"]
 readme = "README.md"
@@ -8,7 +8,7 @@ homepage = "https://github.com/TomasBeuzen/canvasutils"
 repository = "https://github.com/TomasBeuzen/canvasutils"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 canvasapi = "^2.0.0"
 ipywidgets = "^7.5.1"
 

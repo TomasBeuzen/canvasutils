@@ -20,7 +20,7 @@ See the file [pyproject.toml](pyproject.toml), `[tool.poetry.dependencies]`.
 
 ## Usage
 
-### Assignment Submission in JUpyter
+### Assignment Submission in Jupyter
 
 The submit module is made to be used within a Jupyter notebook (.ipynb file):
 
@@ -40,4 +40,4 @@ Contributions are welcomed and recognized. You can see a list of contributors in
 
 ### Credits
 
-This package was originally based on [this repository](https://github.com/eagubsi/JupyterCanvasSubmit) created by [Emily Gubski and Steven Wolfram].
+This package was originally based on [this repository](https://github.com/eagubsi/JupyterCanvasSubmit) created by Emily Gubski and Steven Wolfram.
