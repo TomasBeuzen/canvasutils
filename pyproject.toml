@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "canvasutils"
-version = "0.1.1"
+version = "0.2.0"
 description = "Utilities for interacting with Canvas using Python and the canvasapi."
 authors = ["Tomas Beuzen <tomas.beuzen@stat.ubc.ca>"]
 readme = "README.md"

@@ -13,6 +13,7 @@ pip install canvasutils
 ## Features
 
 - Submit files to Canvas from within a Jupyter notebook.
+- Convert files to formats like `.html` from with canvas.
 - Create assignments (coming)
 - Create assignment rubrics (coming)
 
@@ -34,6 +35,15 @@ course_code = 123456
 
 from canvasutils.submit import submit
 submit(course_code, api_url=api_url, token_present=False)  # token present false allows you to enter token interactively.
+```
+
+### Notebook Conversion in Jupyter
+
+```python
+from canvasutils.submit import convert_notebook
+convert_notebook('example.ipynb', to_format="html")
+
+Notebook successfully converted!
 ```
 
 ## Contributors
