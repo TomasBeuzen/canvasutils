@@ -6,6 +6,7 @@ import re
 import sys
 from IPython.display import display, clear_output
 from canvasapi import Canvas
+import subprocess
 
 
 def _token_verif(course_code: int, api_url: str, token_present: bool):
@@ -97,10 +98,10 @@ class _SubmitWidgets:
     allowed_file_extensions : list
         List of allowed file extensions, e.g., ["html", "csv"]
     widget_width : str, optional
-        Display width of widgets in % or pixels, by default "20%"
+        Display width of widgets in % or pixels, by default "25%"
     """
 
-    def __init__(self, course, allowed_file_extensions, widget_width="20%"):
+    def __init__(self, course, allowed_file_extensions, widget_width="25%"):
         """See 'help(_SubmitWidgets)'."""
         self.course = course
         self.widget_width = widget_width
@@ -125,6 +126,11 @@ class _SubmitWidgets:
             for ext in self.allowed_file_extensions
             for file in glob.glob("*." + ext)
         ]
+        if not len(files):
+            raise OSError(
+                f"No files with extensions {self.allowed_file_extensions} found. Please add files to your local directory or change the kind of extensions allowed when running 'submit(course_code, ..., allowed_file_extensions = [])'."
+            )
+
         menu = widgets.Dropdown(
             options=files,
             layout=widgets.Layout(width=self.widget_width),
@@ -167,6 +173,7 @@ def submit(
     api_url: str = "https://canvas.ubc.ca/",
     allowed_file_extensions: list = ["html"],
     token_present: bool = True,
+    widget_width: str = "25%",
 ) -> None:
     """Interactive file submission to Canvas.
 
@@ -186,7 +193,7 @@ def submit(
     # Verify Token
     course = _token_verif(course_code, api_url, token_present)
     # Initialize widgets
-    s = _SubmitWidgets(course, allowed_file_extensions, widget_width="25%")
+    s = _SubmitWidgets(course, allowed_file_extensions, widget_width=widget_width)
     output = s.output()
     file_menu = s.file_menu()
     file_button = s.button("Select", style="success")
@@ -220,3 +227,23 @@ def submit(
             print(f"Preview here: {submission.preview_url.split('?')[0]}")
 
     file_button.on_click(file_click)
+
+
+def convert_notebook(file_name: str, to_format: str = "html"):
+
+    outp = subprocess.run(
+        ["jupyter", "nbconvert", "--to", to_format, file_name],
+        capture_output=True,
+    )
+
+    if outp.returncode == 0:
+        print("Notebook successfully converted! ")
+    else:
+        error = outp.stderr.decode("ascii")
+        raise _ConversionError(
+            "Sorry I could not convert your notebook to {format}. You can try again, or convert your notebook manually. For example, in JupyterLab, File -> Export as... -> HTML. Here's the full traceback: {error}."
+        )
+
+
+class _ConversionError(Exception):
+    pass
