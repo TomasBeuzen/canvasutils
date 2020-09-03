@@ -109,8 +109,14 @@ class _SubmitWidgets:
 
     def assignment_menu(self):
         assignments = [
-            f"{ass.name} ({ass.id})" for ass in self.course.get_assignments()
+            f"{ass.name} ({ass.id})"
+            for ass in self.course.get_assignments()
+            if "online_upload" in ass.submission_types
         ]
+        if not len(assignments):
+            raise CanvasError(
+                f"No assignments that accept file uploads are available for your course. Please consult the course instructor about this issue."
+            )
         menu = widgets.Dropdown(
             options=assignments,
             layout=widgets.Layout(width=self.widget_width),
@@ -240,10 +246,14 @@ def convert_notebook(file_name: str, to_format: str = "html"):
         print("Notebook successfully converted! ")
     else:
         error = outp.stderr.decode("ascii")
-        raise _ConversionError(
+        raise ConversionError(
             "Sorry I could not convert your notebook to {format}. You can try again, or convert your notebook manually. For example, in JupyterLab, File -> Export as... -> HTML. Here's the full traceback: {error}."
         )
 
 
-class _ConversionError(Exception):
+class ConversionError(Exception):
+    pass
+
+
+class CanvasError(Exception):
     pass
