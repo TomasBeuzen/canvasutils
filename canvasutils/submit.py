@@ -7,9 +7,10 @@ import sys
 from IPython.display import display, clear_output
 from canvasapi import Canvas
 import subprocess
+from typing import Union
 
 
-def _token_verif(course_code: int, api_url: str, token_present: bool):
+def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
     """Verify a connection to Canvas with the given params.
 
     Parameters
@@ -18,9 +19,10 @@ def _token_verif(course_code: int, api_url: str, token_present: bool):
         Course code, get from canvas course url, e.g., 53659.
     api_url : str
         The base URL of the Canvas instance's API, e.g., "https://canvas.ubc.ca/"
-    token_present : bool
-        If you have an environment variable "CANVAS_API". If you don't,
-        set to False and enter token interactively
+    token : Union[bool, str]
+        True if you have an environment variable "CANVAS_API". If you don't,
+        set to False and enter token interactively. You can also pass your
+        token directly as a string
 
     Returns
     -------
@@ -28,7 +30,7 @@ def _token_verif(course_code: int, api_url: str, token_present: bool):
         Canvas course object
     """
 
-    if token_present:
+    if token == True:
         api_key = os.environ.get("CANVAS_API")
         if api_key is None:
             raise NameError(
@@ -43,6 +45,17 @@ def _token_verif(course_code: int, api_url: str, token_present: bool):
                 "I found a token but could not access the given Canvas course. Perhaps you entered the wrong course code? Or your token is invalid? You can also try to use 'submit(course_code, token_present=False)' to enter your token interactively."
             )
             raise
+    elif isinstance(token, str):
+        try:
+            canvas = Canvas(api_url, token)
+            course = canvas.get_course(course_code)
+            return course
+        except:
+            print(
+                "I found a token but could not access the given Canvas course. Perhaps you entered the wrong course code? Or your token is invalid? You can also try to use 'submit(course_code, token_present=False)' to enter your token interactively."
+            )
+            raise
+
     else:
         print("Please paste your token here and then hit enter:")
         api_key = input()
@@ -178,7 +191,7 @@ def submit(
     course_code: int,
     api_url: str = "https://canvas.ubc.ca/",
     allowed_file_extensions: list = ["html"],
-    token_present: bool = True,
+    token: Union[bool, str] = True,
     widget_width: str = "25%",
 ) -> None:
     """Interactive file submission to Canvas.
@@ -192,12 +205,13 @@ def submit(
     allowed_file_extensions: list, optional
         List of allowed file extensions to choose from when submitting
     token_present : bool, optional
-        If you have an environment variable "CANVAS_API". If you don't,
-        set to False and enter token interactively, by default True
+        True if you have an environment variable "CANVAS_API". If you don't,
+        set to False and enter token interactively. You can also pass your
+        token directly as a string, by default True
     """
 
     # Verify Token
-    course = _token_verif(course_code, api_url, token_present)
+    course = _token_verif(course_code, api_url, token)
     # Initialize widgets
     s = _SubmitWidgets(course, allowed_file_extensions, widget_width=widget_width)
     output = s.output()

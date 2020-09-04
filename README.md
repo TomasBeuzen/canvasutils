@@ -34,7 +34,7 @@ api_url = "https://canvas.instructure.com/"
 course_code = 123456
 
 from canvasutils.submit import submit
-submit(course_code, api_url=api_url, token_present=False)  # token present false allows you to enter token interactively.
+submit(course_code, api_url=api_url, token=False)  # token present False allows you to enter token interactively.
 ```
 
 ### Notebook Conversion in Jupyter
