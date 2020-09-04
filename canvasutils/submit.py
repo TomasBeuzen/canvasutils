@@ -236,6 +236,15 @@ def submit(
 
 
 def convert_notebook(file_name: str, to_format: str = "html"):
+    """Convert a .ipynb notebook file to another format using the nbconvert package.
+
+    Parameters
+    ----------
+    file_name : str
+        File to convert, e.g., "notebook.ipynb"
+    to_format : str, optional
+        Supported file format to convert to see https://nbconvert.readthedocs.io/en/latest/usage.html#supported-output-formats, by default "html"
+    """
 
     outp = subprocess.run(
         ["jupyter", "nbconvert", "--to", to_format, file_name],

@@ -53,21 +53,3 @@ Contributions are welcomed and recognized. You can see a list of contributors in
 ### Credits
 
 This package was originally based on [this repository](https://github.com/eagubsi/JupyterCanvasSubmit) created by Emily Gubski and Steven Wolfram.
-
-| Lecture | Notebook | Recordings | Practice Exercises |
-|---------|----------|------------|--------------------|
-| 1       | ✔️       |            |                    |
-| 2       | ✔️       |            |                    |
-| 3       |          |            |                    |
-| 4       |          |            |                    |
-| 5       |          |            |                    |
-| 6       |          |            |                    |
-| 7       |          |            |                    |
-| 8       |          |            |                    |
-
-| Lab | Draft | Complete |
-|-----|-------|----------|
-| 1   | ✔️    |          |
-| 2   | ✔️    |          |
-| 3   | ✔️    |          |
-| 4   |       |          |
