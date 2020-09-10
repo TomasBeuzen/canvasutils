@@ -8,6 +8,8 @@ from IPython.display import display, clear_output
 from canvasapi import Canvas
 import subprocess
 from typing import Union
+import getpass
+from .utils import _message_box
 
 
 def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
@@ -20,7 +22,7 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
     api_url : str
         The base URL of the Canvas instance's API, e.g., "https://canvas.ubc.ca/"
     token : Union[bool, str]
-        True if you have an environment variable "CANVAS_API". If you don't,
+        True if you have an environment variable "CANVAS_PAT". If you don't,
         set to False and enter token interactively. You can also pass your
         token directly as a string
 
@@ -31,10 +33,10 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
     """
 
     if token == True:
-        api_key = os.environ.get("CANVAS_API")
+        api_key = os.environ.get("CANVAS_PAT")
         if api_key is None:
             raise NameError(
-                "Sorry, I could not find a token 'CANVAS_API' in your environment variables. Check your environment variables, or use 'submit(course_code, token_present=False)' to try enter your token interactively."
+                "Sorry, I could not find a token 'CANVAS_PAT' in your environment variables. Check your environment variables, or use 'submit(course_code, token_present=False)' to try enter your token interactively."
             )
         try:
             canvas = Canvas(api_url, api_key)
@@ -58,9 +60,8 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
 
     else:
         print("Please paste your token here and then hit enter:")
-        api_key = input()
-        clear_output(wait=True)
-        print("Token successfully entered - thanks!")
+        api_key = getpass.getpass()
+        _message_box(" Token successfully entered - thanks!", color="green")
         print("")
         try:
             canvas = Canvas(api_url, api_key)
@@ -205,7 +206,7 @@ def submit(
     allowed_file_extensions: list, optional
         List of allowed file extensions to choose from when submitting
     token_present : bool, optional
-        True if you have an environment variable "CANVAS_API". If you don't,
+        True if you have an environment variable "CANVAS_PAT". If you don't,
         set to False and enter token interactively. You can also pass your
         token directly as a string, by default True
     """
@@ -235,6 +236,7 @@ def submit(
     def ass_click(ass_button):
         ass_button.disabled = True
         with output:
+            print(f"")
             print(f"Submitting {file_menu.value} to {ass_menu.value}.")
             print("Please wait. This could take a minute.")
             print("")
@@ -243,8 +245,14 @@ def submit(
             course.get_assignment(re.findall(r"\((\d+)\)", ass_menu.value)[-1]),
         )
         with output:
-            print("Successfully Submitted!")
-            print(f"Preview here: {submission.preview_url.split('?')[0]}")
+            _message_box(
+                "Successfully submitted!\n"
+                "\n"
+                "View your submission:\n"
+                f"{submission.preview_url.split('?')[0]}"
+            )
+            # print("Successfully Submitted!")
+            # print(f"Preview here: {submission.preview_url.split('?')[0]}")
 
     file_button.on_click(file_click)
 

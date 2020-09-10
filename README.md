@@ -12,20 +12,20 @@ pip install canvasutils
 
 ## Features
 
-- Submit files to Canvas from within a Jupyter notebook.
+- Submit files to Canvas from within a Jupyter notebook with user-friendly widgets.
 - Convert files to formats like `.html` from with canvas.
 - Create assignments (coming)
 - Create assignment rubrics (coming)
 
 ## Dependencies
 
-See the file [pyproject.toml](pyproject.toml), `[tool.poetry.dependencies]`.
+See the file [pyproject.toml](pyproject.toml), under the section `[tool.poetry.dependencies]`.
 
 ## Usage
 
 ### Assignment Submission in Jupyter
 
-The submit module is made to be used within a Jupyter notebook (.ipynb file):
+The submit module is made to be used within a Jupyter notebook (.ipynb file). See the provided [example.ipynb](example.ipynb):
 
 ![](docs/img/assignment_submit.gif)
 
@@ -34,7 +34,7 @@ api_url = "https://canvas.instructure.com/"
 course_code = 123456
 
 from canvasutils.submit import submit
-submit(course_code, api_url=api_url, token=False)  # token present False allows you to enter token interactively.
+submit(course_code, api_url=api_url, token=False)  # token=False allows you to enter token interactively
 ```
 
 ### Notebook Conversion in Jupyter
