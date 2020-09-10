@@ -27,7 +27,7 @@ See the file [pyproject.toml](pyproject.toml), under the section `[tool.poetry.d
 
 The submit module is made to be used within a Jupyter notebook (.ipynb file). See the provided [example.ipynb](example.ipynb):
 
-![](docs/img/assignment_submit.gif)
+![](docs/img/canvas_utils.gif)
 
 ```python
 api_url = "https://canvas.instructure.com/"
