@@ -25,9 +25,11 @@ See the file [pyproject.toml](pyproject.toml), under the section `[tool.poetry.d
 
 ### Assignment Submission in Jupyter
 
-The submit module is made to be used within a Jupyter notebook (.ipynb file). See the provided [example.ipynb](example.ipynb):
+The submit module is made to be used within a Jupyter notebook (.ipynb file). See the provided [example.ipynb](example.ipynb). There are two available submission interfaces, widget-based drop-down menus, or text-based entries.
 
-![](docs/img/canvasutils_demo.gif)
+#### Widget Submission
+
+![widget_gif](docs/img/canvasutils_widget.gif)
 
 ```python
 api_url = "https://canvas.instructure.com/"
@@ -35,6 +37,14 @@ course_code = 123456
 
 from canvasutils.submit import submit
 submit(course_code, api_url=api_url, token=False)  # token=False allows you to enter token interactively
+```
+
+#### Text-based Submission
+
+![text_gif](docs/img/canvasutils_text.gif)
+
+```python
+submit(course_code, api_url=api_url, token=False, no_widgets=True)interactively
 ```
 
 ### Notebook Conversion in Jupyter
