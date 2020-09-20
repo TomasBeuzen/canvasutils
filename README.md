@@ -1,4 +1,5 @@
 # CanvasUtils
+[![PyPI version](https://badge.fury.io/py/canvasutils.svg)](https://badge.fury.io/py/canvasutils)
 
 Utilities for interacting with Canvas using Python and the canvasapi.
 
