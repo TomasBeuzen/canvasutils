@@ -36,7 +36,7 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
         api_key = os.environ.get("CANVAS_PAT")
         if api_key is None:
             raise NameError(
-                "Sorry, I could not find a token 'CANVAS_PAT' in your environment variables. Check your environment variables, or use 'submit(course_code, token_present=False)' to try enter your token interactively."
+                "Sorry, I could not find a token 'CANVAS_PAT' in your environment variables.\nCheck your environment variables, or use 'submit(course_code, token_present=False)' to try enter your token interactively."
             )
         try:
             canvas = Canvas(api_url, api_key)
@@ -44,7 +44,7 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
             return course
         except:
             print(
-                "I found a token but could not access the given Canvas course. Perhaps you entered the wrong course code? Or your token is invalid? You can also try to use 'submit(course_code, token_present=False)' to enter your token interactively."
+                "I found a token but could not access the given Canvas course.\nPerhaps you entered the wrong course code? Or your token is invalid?\nYou can also try to use 'submit(course_code, token=False)' to enter your token interactively."
             )
             raise
     elif isinstance(token, str):
@@ -54,7 +54,7 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
             return course
         except:
             print(
-                "I found a token but could not access the given Canvas course. Perhaps you entered the wrong course code? Or your token is invalid? You can also try to use 'submit(course_code, token_present=False)' to enter your token interactively."
+                "I could not access the given Canvas course with your token.\nPerhaps you entered the wrong course code? Or your token is invalid?"
             )
             raise
 
@@ -69,7 +69,7 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
             return course
         except:
             print(
-                "You entered a token but I still could not access the given Canvas course. Perhaps you entered the wrong course code? Or your token is invalid?"
+                "You entered a token but I could not access the given Canvas course.\nPerhaps you entered the wrong course code, the wrong token, or your token is invalid?"
             )
             raise
 
@@ -95,11 +95,71 @@ def _upload_assignment(file: str, assignment):
             {"submission_type": "online_upload", "file_ids": [file_id]}
         )
         return submission
-    except:
+    except Exception as e:
         print(
-            "Something went wrong and I could not submit your assignment. In case it's helpful, the error was:"
+            "Something went wrong and I could not submit your assignment.\nIn case it's helpful, the error was:\n{n}"
         )
-        raise
+
+
+def _text_submission(course, allowed_file_extensions: list = ["html"]):
+    """Text-based assignment submission.
+
+    Parameters
+    ----------
+    course : canvasapi.course.Course
+        Canvas course object.
+    allowed_file_extensions: list, optional
+        List of allowed file extensions to choose from when submitting.
+    """
+    assignments = [
+        (ass.name, ass.id)
+        for ass in course.get_assignments()
+        if "online_upload" in ass.submission_types
+    ]
+    assignment_names = [_[0] for _ in assignments]
+    assignment_ids = [_[1] for _ in assignments]
+    if not len(assignment_names):
+        raise CanvasError(
+            f"No assignments that accept file uploads are available for your course.\nPlease consult the course instructor about this issue."
+        )
+    _message_box("Entering text-based submission mode...", color="orange")
+    print("Assignments available to submit to:")
+    print(f" {assignment_names}")
+    print("Enter the name of the assignment you wish to submit to:")
+    ass = input().replace("'", "")  # replace single quotes if the user used them
+    if not ass.lower() in [_.lower() for _ in assignment_names]:
+        raise SelectionError(
+            f"'{ass}' is not a valid assignment name. Please enter one of the following: {assignment_names}."
+        )
+    files = [file for ext in allowed_file_extensions for file in glob.glob("*." + ext)]
+    if not len(files):
+        raise OSError(
+            f"No files with extensions {allowed_file_extensions} found.\nPlease add files to your local directory or change the kind of extensions allowed when running 'submit(course_code, ..., allowed_file_extensions = [])'."
+        )
+    print("")
+    print("Files available to submit:")
+    print(f" {files}")
+    print(
+        f"Enter the name of the file (including extension) you wish to submit to '{ass}':"
+    )
+    file = input().replace("'", "")
+    if not file.lower() in [_.lower() for _ in files]:
+        raise SelectionError(
+            f"'{file}' is not a valid file name. Please enter one of the following: {files}."
+        )
+    print(f"")
+    print(f"Submitting '{file}' to '{ass}'.")
+    print("Please wait. This could take a minute.")
+    ass_index = [_.lower() for _ in assignment_names].index(ass.lower())
+    submission = _upload_assignment(
+        file, course.get_assignment(assignment_ids[ass_index])
+    )
+    _message_box(
+        "Successfully submitted!\n"
+        "\n"
+        "View your submission:\n"
+        f"{submission.preview_url.split('?')[0]}"
+    )
 
 
 class _SubmitWidgets:
@@ -129,12 +189,12 @@ class _SubmitWidgets:
         ]
         if not len(assignments):
             raise CanvasError(
-                f"No assignments that accept file uploads are available for your course. Please consult the course instructor about this issue."
+                f"No assignments that accept file uploads are available for your course.\nPlease consult the course instructor about this issue."
             )
         menu = widgets.Dropdown(
             options=assignments,
             layout=widgets.Layout(width=self.widget_width),
-            value=assignments[0],
+            value=assignments[-1],  # default to most recent assignment
             description="",
             disabled=False,
         )
@@ -148,7 +208,7 @@ class _SubmitWidgets:
         ]
         if not len(files):
             raise OSError(
-                f"No files with extensions {self.allowed_file_extensions} found. Please add files to your local directory or change the kind of extensions allowed when running 'submit(course_code, ..., allowed_file_extensions = [])'."
+                f"No files with extensions {self.allowed_file_extensions} found.\nPlease add files to your local directory or change the kind of extensions allowed when running 'submit(course_code, ..., allowed_file_extensions = [])'."
             )
 
         menu = widgets.Dropdown(
@@ -194,6 +254,7 @@ def submit(
     allowed_file_extensions: list = ["html"],
     token: Union[bool, str] = True,
     widget_width: str = "25%",
+    no_widgets: bool = False,
 ) -> None:
     """Interactive file submission to Canvas.
 
@@ -205,56 +266,64 @@ def submit(
         The base URL of the Canvas instance's API, by default "https://canvas.ubc.ca/"
     allowed_file_extensions: list, optional
         List of allowed file extensions to choose from when submitting
-    token_present : bool, optional
+    token : bool, optional
         True if you have an environment variable "CANVAS_PAT". If you don't,
         set to False and enter token interactively. You can also pass your
         token directly as a string, by default True
+    widget_width: str, optional
+        Width of the displayed widgets as a percentage of the output display, by default 25%
+    no_widgets: bool, optional
+        Specify True for a text-based submission without interactive widgets, by default False.
     """
 
     # Verify Token
     course = _token_verif(course_code, api_url, token)
-    # Initialize widgets
-    s = _SubmitWidgets(course, allowed_file_extensions, widget_width=widget_width)
-    output = s.output()
-    file_menu = s.file_menu()
-    file_button = s.button("Select", style="success")
-    ass_menu = s.assignment_menu()
-    ass_button = s.button("Select", style="success")
-    # Select file to submit
-    print("Select a file to submit:")
-    with output:
-        display(file_menu, file_button)
-    display(output)
-    # Select assinment to submit to then upload
-    def file_click(file_button):
-        file_button.disabled = True
-        print("Select assignment to submit to:")
+    if not no_widgets:
+        # Initialize widgets
+        s = _SubmitWidgets(course, allowed_file_extensions, widget_width=widget_width)
+        output = s.output()
+        file_menu = s.file_menu()
+        file_button = s.button("Select", style="success")
+        ass_menu = s.assignment_menu()
+        ass_button = s.button("Select", style="success")
+        # Select assignment to submit to
+        print("Select an assignment to submit to:")
         with output:
             display(ass_menu, ass_button)
-        ass_button.on_click(ass_click)
+        display(output)
 
-    def ass_click(ass_button):
-        ass_button.disabled = True
-        with output:
-            print(f"")
-            print(f"Submitting {file_menu.value} to {ass_menu.value}.")
-            print("Please wait. This could take a minute.")
-            print("")
-        submission = _upload_assignment(
-            file_menu.value,
-            course.get_assignment(re.findall(r"\((\d+)\)", ass_menu.value)[-1]),
-        )
-        with output:
-            _message_box(
-                "Successfully submitted!\n"
-                "\n"
-                "View your submission:\n"
-                f"{submission.preview_url.split('?')[0]}"
+        # Select assignment to submit
+        def ass_click(ass_button):
+            ass_button.disabled = True
+            with output:
+                print("\nSelect a file to submit:")
+                display(file_menu, file_button)
+            file_button.on_click(file_click)
+
+        def file_click(file_button):
+            file_button.disabled = True
+            with output:
+                print(f"")
+                print(f"Submitting {file_menu.value} to {ass_menu.value}.")
+                print("Please wait. This could take a minute.")
+                print("")
+            submission = _upload_assignment(
+                file_menu.value,
+                course.get_assignment(re.findall(r"\((\d+)\)", ass_menu.value)[-1]),
             )
-            # print("Successfully Submitted!")
-            # print(f"Preview here: {submission.preview_url.split('?')[0]}")
+            with output:
+                _message_box(
+                    "Successfully submitted!\n"
+                    "\n"
+                    "View your submission:\n"
+                    f"{submission.preview_url.split('?')[0]}"
+                )
+                # print("Successfully Submitted!")
+                # print(f"Preview here: {submission.preview_url.split('?')[0]}")
 
-    file_button.on_click(file_click)
+        ass_button.on_click(ass_click)
+    else:
+        _text_submission(course, allowed_file_extensions)
 
 
 def convert_notebook(file_name: str, to_format: str = "html"):
@@ -287,4 +356,8 @@ class ConversionError(Exception):
 
 
 class CanvasError(Exception):
+    pass
+
+
+class SelectionError(Exception):
     pass
