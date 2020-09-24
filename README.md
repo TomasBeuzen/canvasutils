@@ -45,7 +45,7 @@ submit(course_code, api_url=api_url, token=False)  # token=False allows you to e
 ![text_gif](docs/img/canvasutils_text.gif)
 
 ```python
-submit(course_code, api_url=api_url, token=False, no_widgets=True)interactively
+submit(course_code, api_url=api_url, token=False, no_widgets=True)
 ```
 
 ### Notebook Conversion in Jupyter
