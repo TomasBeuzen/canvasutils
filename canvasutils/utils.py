@@ -1,6 +1,5 @@
 from textwrap import dedent
 
-border = "=" * 38
 endc = "\033[0m"
 bcolors = dict(
     blue="\033[94m",
@@ -16,7 +15,7 @@ def _color_message(msg, style):
     return bcolors[style] + msg + endc
 
 
-def _message_box(msg, color="green", doprint=True, print_func=print):
+def _message_box(msg, color="green", border="=" * 38, doprint=True, print_func=print):
     # Prepare the message so the indentation is the same as the box
     msg = dedent(msg)
 

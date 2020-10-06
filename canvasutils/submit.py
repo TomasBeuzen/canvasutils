@@ -95,9 +95,9 @@ def _upload_assignment(file: str, assignment):
             {"submission_type": "online_upload", "file_ids": [file_id]}
         )
         return submission
-    except Exception as e:
-        print(
-            "Something went wrong and I could not submit your assignment.\nIn case it's helpful, the error was:\n{n}"
+    except:
+        raise CanvasError(
+            f"Something went wrong and I could not submit your assignment.\nAre you using an instructor token? Instructors cannot submit assignments."
         )
 
 
@@ -307,17 +307,28 @@ def submit(
                 print(f"Submitting {file_menu.value} to {ass_menu.value}.")
                 print("Please wait. This could take a minute.")
                 print("")
-            submission = _upload_assignment(
-                file_menu.value,
-                course.get_assignment(re.findall(r"\((\d+)\)", ass_menu.value)[-1]),
-            )
-            with output:
-                _message_box(
-                    "Successfully submitted!\n"
-                    "\n"
-                    "View your submission:\n"
-                    f"{submission.preview_url.split('?')[0]}"
+            try:
+                submission = _upload_assignment(
+                    file_menu.value,
+                    course.get_assignment(re.findall(r"\((\d+)\)", ass_menu.value)[-1]),
                 )
+                with output:
+                    _message_box(
+                        "Successfully submitted!\n"
+                        "\n"
+                        "View your submission:\n"
+                        f"{submission.preview_url.split('?')[0]}"
+                    )
+            except CanvasError:
+                with output:
+                    _message_box(
+                        "Something went wrong and I could not submit your assignment.\n"
+                        "Are you using an instructor token? Instructors cannot submit assignments.\n"
+                        "I'll print the traceback below.",
+                        color="red",
+                        border="=" * 73,
+                    )
+                    raise
                 # print("Successfully Submitted!")
                 # print(f"Preview here: {submission.preview_url.split('?')[0]}")
 

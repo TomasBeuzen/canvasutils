@@ -50,6 +50,8 @@ submit(course_code, api_url=api_url, token=False, no_widgets=True)
 
 ### Notebook Conversion in Jupyter
 
+Note that this command will convert the most recently saved version of a notebook. *You should save your notebook before executing this command in a cell*.
+
 ```python
 from canvasutils.submit import convert_notebook
 convert_notebook('example.ipynb', to_format="html")
