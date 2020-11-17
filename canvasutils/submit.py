@@ -36,7 +36,7 @@ def _token_verif(course_code: int, api_url: str, token: Union[bool, str]):
         api_key = os.environ.get("CANVAS_PAT")
         if api_key is None:
             raise NameError(
-                "Sorry, I could not find a token 'CANVAS_PAT' in your environment variables.\nCheck your environment variables, or use 'submit(course_code, token_present=False)' to try enter your token interactively."
+                "Sorry, I could not find a token 'CANVAS_PAT' in your environment variables.\nCheck your environment variables, or use 'submit(course_code, token=False)' to try enter your token interactively."
             )
         try:
             canvas = Canvas(api_url, api_key)
