@@ -5,11 +5,22 @@ Utilities for interacting with Canvas using Python and the canvasapi.
 
 ## Installation
 
+
+### Pip
+
 ```bash
 pip install canvasutils
 ```
 
 `canvasutils` depends on the `ipywidgets` packages. To make sure widgets render correctly in notebooks, you may need to enable the widgets extension in Jupyter following [these instructions in the ipywidgets docs](https://ipywidgets.readthedocs.io/en/latest/user_install.html#installation), in particular, follow [these instructions](https://ipywidgets.readthedocs.io/en/latest/user_install.html#installing-the-jupyterlab-extension) if using Jupyter Lab.
+
+### Conda
+
+I periodically make conda builds which can be viewed [here](https://anaconda.org/TomasBeuzen/canvasutils). Install with:
+
+```sh
+conda install -c tomasbeuzen canvasutils
+```
 
 ## Features
 
